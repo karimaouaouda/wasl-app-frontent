@@ -1,17 +1,14 @@
-import ScreenTitle from "@/components/partials/ScreenTitle";
 import axios from "axios";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { Button, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { ArrowLeft } from "react-bootstrap-icons";
-import AppLogo from "@/components/utils/AppLogo";
-import Input from "@/components/utils/Input";
-import Btn from "@/components/utils/Btn";
-
+import { Button, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import '@/global.css';
 interface ErrorsProps {
   email?: string;
   password?: string;
 }
+import ScreenTitle from "@/components/partials/ScreenTitle";
+import Btn from "@/components/utils/Btn";
 
 export default function LoginScreen() {
   // generate a login page containing login form email password and login button
@@ -20,9 +17,6 @@ export default function LoginScreen() {
   const [token, setToken] = useState(null);
   const [errors, setErrors] = useState<ErrorsProps | null>(null);
 
-  useEffect(() => {
-    axios.get('http://localhost:8000/sanctum/csrf-cookie')
-  }, [])
 
   function testAuth() {
     axios.get('http://localhost:8000/api/user', {
@@ -43,43 +37,62 @@ export default function LoginScreen() {
         setToken(response.data.token);
         console.log(response.data);
       })
-  } 
+  }
   return (
-    <View className="h-screen w-screen bg-white">
-      <ScreenTitle title="Login Page" />
+    <View
+      className="flex flex-col min-h-screen bg-[#fb6f16] w-screen relative"
+    >
+      <ScreenTitle
+        classes="text-white"
+        title="back" />
+      <View className="flex justify-start flex-row space-x-2 items-center w-full px-10 mt-20">
+        <Image
+          source={require('@/assets/icons/delivery-color.png')}
+          alt="Logo"
+          className="!w-24 !h-24"
+          resizeMode="contain"
+        />
+        <View className="flex flex-1 flex-col items-start justify-center space-y-2">
+          <Text className="text-start w-fit text-2xl font-bold p-0 text-white">Wasl</Text>
+          <Text className="text-start text-white text-sm word-wrap overflow-wrap">
+            Connection restaurents with delivery partners
+          </Text>
+        </View>
+      </View>
 
-      <View className="flex flex-col items-center justify-center space-y-4 mt-20">
-        <AppLogo />
-
-        <Input
+      <View className="w-full flex flex-col items-center justify-center mt-10 px-14 space-y-4">
+        <TextInput
           placeholder="Email"
-          keyboardType="email-address"
-          inputErrorClasses="border-red-500"
-          error={errors?.email} />
 
-        <Input
-          placeholder="password"
-          keyboardType="default"
-          secureTextEntry={true}
-          inputErrorClasses="border-red-500"
-          error={errors?.password} />
+          className="w-full bg-white rounded-lg p-4 text-sm text-gray-700" />
+        <TextInput
+          placeholder="Password"
+          className="w-full bg-white rounded-lg p-4 text-sm text-gray-700" />
 
-        <Btn text="Login" classes="bg-green-500 lg:bg-red-100 !w-fit"/>
+        <Btn text="Log In" classes="bg-white !text-black w-1/3 py-2 font-semibold" textClasses="!text-slate-800"></Btn>
+        <Link href="/home" className="text-white text-sm">Forgot Password? click here</Link>
+        <Text className="text-white text-sm">Or</Text>
+        <TouchableOpacity
+          className="w-full bg-white rounded-lg py-3 flex flex-row space-x-2 items-center justify-center" onPress={() => { }}>
+          <Image
+            source={require('@/assets/icons/google.png')}
+            alt="Google" className="!w-8 !h-8"
+            resizeMode="contain" />
+          <Text className="text-black text-center text-lg">Login with Google</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="w-full bg-white rounded-lg py-3 flex flex-row space-x-2 items-center justify-center" onPress={() => { }}>
+          <Image
+            source={require('@/assets/icons/facebook-f.png')}
+            alt="Facebook" className="!w-6 !h-6"
+            resizeMode="contain" />
+          <Text className="text-black text-center text-lg">Login with Facebook</Text>
+        </TouchableOpacity>
+        <Text className="text-white text-sm">Don't have an account? <Link href="/auth/register" className="text-white font-bold">Register</Link></Text>
+        <Text className="text-white text-sm text-center">By signing in you agree to our <Link href="/home" className="text-white font-bold">Terms of Service</Link> and <Link href="/home" className="text-white font-bold">Privacy Policy</Link></Text>
+
       </View>
-      <View className="flex flex-col">
-        <View className="flex flex-row justify-center items-center mt-4 space-x-2">
-          <Text className="text-gray-500">Don't have an account?</Text>
-          <Link href="/auth/register" asChild>
-            <Text className="text-red-500 font-bold">Register</Text>
-          </Link>
-        </View>
-        <View className="flex flex-row justify-center items-center mt-2 space-x-2">
-          <Text className="text-gray-500">forget your password?</Text>
-          <Link href="/(tabs)" asChild>
-            <Text className="text-red-500 font-bold">reset it</Text>
-          </Link>
-        </View>
-      </View>
+
+      <Text className="w-full text-white text-sm text-center absolute bottom-4 left-0">© 2025 Wasl. All rights reserved.</Text>
     </View>
   );
 }
