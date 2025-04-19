@@ -102,7 +102,7 @@ export default function OrderView() {
                 </TouchableOpacity>
             </View>
 
-            {tab !== 0 ? <Details/> : <OrderDetails/>}
+            {tab === 0 ? <Details/> : <OrderDetails/>}
         </ScrollView>
     )
 }
