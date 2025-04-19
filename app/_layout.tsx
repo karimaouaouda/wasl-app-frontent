@@ -1,4 +1,6 @@
 import { Stack } from "expo-router";
+import { I18nManager } from 'react-native';
+
 
 export default function RootLayout() {
   return (<>
@@ -7,7 +9,6 @@ export default function RootLayout() {
       <Stack.Screen name="home" />
       <Stack.Screen name="auth/login" />
       <Stack.Screen name="auth/register" />
-      <Stack.Screen name="auth/forgot-password" />
     </Stack>
   </>)
 }

@@ -1,21 +1,37 @@
 {
   "expo": {
     "name": "Wasl",
-    "slug": "Wasl",
+    "slug": "wasl",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "extra": {
+      "supportsRTL": false,
+      "forcesRTL": false,
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ef9f4da5-0dd3-484a-a265-2b835d6b204a"
+      }
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "ExpoLocalization_supportsRTL": true,
+        "ExpoLocalization_forcesRTL": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "supportsRtl": false,
+      "package": "com.karimaouaouda.Wasl"
     },
     "web": {
       "bundler": "metro",
@@ -23,6 +39,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "expo-localization",
       "expo-router",
       [
         "expo-splash-screen",
@@ -32,10 +49,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "owner": "karimaouaouda"
   }
 }

@@ -53,7 +53,9 @@ export default function LoginScreen() {
           resizeMode="contain"
         />
         <View className="flex flex-1 flex-col items-start justify-center space-y-2">
-          <Text className="text-start w-fit text-2xl font-bold p-0 text-white">Wasl</Text>
+          <Text className="text-start w-fit text-2xl font-bold p-0 text-white">
+            Wasl
+          </Text>
           <Text className="text-start text-white text-sm word-wrap overflow-wrap">
             Connection restaurents with delivery partners
           </Text>

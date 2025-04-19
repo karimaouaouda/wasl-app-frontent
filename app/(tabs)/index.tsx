@@ -1,75 +1,86 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Switch, Text, View, Image, TouchableOpacity, ScrollView } from "react-native";
+import { useState } from "react";
+import { I18nManager } from "react-native";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Link } from "expo-router";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Link } from 'expo-router';
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+export default function ActiveTab() {
+    // initilize states
+    const [isEnabled, setIsEnabled] = useState(false);
+    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+
+    // get current language
+
+    return (
+        <ScrollView className="w-screen h-screen bg-slate-100 p-4">
+            <View className="toggle-button-wrapper flex flex-row justify-between">
+                <View className="flex flex-row items-center space-x-2">
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#03fc41" }}
+                        thumbColor={isEnabled ? "#03fc41" : "#f4f3f4"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={toggleSwitch}
+                        value={isEnabled}
+                    />
+                    <Text className={"text-sm font-semibold " + (isEnabled ? 'text-green-500' : 'text-slate-800')}>{I18nManager.isRTL ? "متاح" : "Active"}</Text>
+                </View>
+                <TouchableOpacity>
+                    <IconSymbol className="text-green-500" name="cached" size={24} color="#767577" />
+                </TouchableOpacity>
+            </View>
+
+            <View className="flex flex-col gap-2 mt-4 mb-10">
+                <Link href={"/order/OrderView?order_id=5"} className="w-full block">
+                    <View className="bg-white p-4 rounded-lg shadow-md w-full">
+                        <View className="flex flex-row justify-between items-center">
+                            <Text className="text-green-500 text-sm border rounded-lg p-2">
+                                {I18nManager.isRTL ? 'جاري التحضير' : 'Preparing'}
+                            </Text>
+                            <Text className="text-sm font-semibold text-gray-500">
+                                {I18nManager.isRTL ? 'منذ يومين' : '2 Days Ago'}
+                            </Text>
+                        </View>
+                        <View className="flex flex-row justify-between items-center mt-2">
+                            <Text className="text-lg font-semibold">#2548</Text>
+                            <View className="flex flex-col space-y-1">
+                                <Text className="text-sm font-semibold text-gray-500 text-xs text-green-500">
+                                    120.35 SAR
+                                </Text>
+                                <Text className="text-sm font-semibold text-gray-500 text-xs text-green-500">
+                                    {I18nManager.isRTL ? "دفع إلكتروني" : "E-Payment"}
+                                </Text>
+                            </View>
+                        </View>
+                        <View className="flex flex-row justify-start items-center mt-2 space-x-2">
+                            <Image
+                                style={{ objectFit: 'contain' }}
+                                source={require('@/assets/images/custom/logo.png')} // Replace with your image URL
+                                className="w-14 h-20"
+                            />
+                            <View className="flex flex-col justify-around items-start">
+                                <Text className="text-sm font-semibold text-gray-500 ml-2">
+                                    Mandimajeed
+                                </Text>
+                                <Text className="text-sm font-semibold text-gray-500 ml-2">
+                                    {I18nManager.isRTL ? "الإستلام: فرع القيروان" : "Pickup: Al-Qayrawan Branch"}
+                                </Text>
+                                <Text className="text-sm font-semibold text-gray-500 ml-2">
+                                    {I18nManager.isRTL ? "وقت التوصيل: 05/04/2025 - 14:05" : "Delivery Time: 05/04/2025 - 14:05"}
+                                </Text>
+                            </View>
+                        </View>
+                        <View className="buttons flex gap-4 flex-row items-center mt-4">
+                            <TouchableOpacity className="bg-green-500 rounded-lg p-2 flex-1">
+                                <Text className="text-white text-center font-semibold">{I18nManager.isRTL ? "تأكيد" : "Confirm"}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity className="bg-red-500 rounded-lg p-2 flex-1">
+                                <Text className="text-white text-center font-semibold">{I18nManager.isRTL ? "رفض" : "reject"}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Link>
+            </View>
+        </ScrollView>
+    )
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
