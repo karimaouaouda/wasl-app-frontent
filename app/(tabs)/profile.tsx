@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, TouchableOpacity } from "react-native";
+import { ScrollView, View, Text, TouchableOpacity, Image } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Link } from "expo-router";
@@ -19,10 +19,13 @@ export default function ProfileTab() {
                     v1.0.0
                 </Text>
             </View>
-            <View className="w-full flex flex-row items-center justify-between mt-10 p-4">
+            <View className="w-full flex flex-row items-center justify-between mt-10 p-4 bg-white rounded-lg shadow-md">
                 <View className="w-fit flex flex-row gap-4 items-center">
-                    <View className="w-24 h-24 bg-slate-300 rounded-full items-center justify-center">
-                        <IconSymbol name="person" size={50} color="#767577" />
+                    <View className="w-24 h-24 bg-slate-300 rounded-full items-center justify-center overflow-hidden border-2 border-sky-700 shadow">
+                        <Image
+                            source={require('@/assets/images/custom/profile.jpeg')}
+                            className="w-full h-full"
+                        />
                     </View>
                     <View className="flex flex-col items-start">
                         <Text className="text-lg font-bold text-center" style={{ fontSize: 20 }}>
