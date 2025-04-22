@@ -28,12 +28,11 @@ export default function ActiveTab() {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'َAuthorization': `Bearer ${auth.getToken()}`,
+                'Authorization': `Bearer ${auth.getToken()}`,
             },
             method: 'GET',
         }).then(res => {
             if (res.status === 200 || res.status === 201) {
-                console.log(res.json())
                 return res.json()
             } else {
                 console.log(res)
@@ -47,10 +46,14 @@ export default function ActiveTab() {
                     alert('no data for some reason')
                 }
                 setData(json_data.data)
+            }).catch(err => {
+                setLoading(false)
+                console.error(err)
             })
     }
     useEffect(() => {
         if(!data){
+            console.log('gettting data ...')
             loadOrders()
         }
     }, [data, isEnabled]); // add isEnabled to the dependency array to refetch data when it changes
