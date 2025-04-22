@@ -36,7 +36,6 @@ export default function Index() {
           <Text className="text-white text-lg">Register</Text>
         </Link>
         <Link href={'/home'} className="w-full py-3 bg-[#f8f8f5] rounded-md flex flex-row items-center justify-center">
-          <Google className="mr-2" size={24} color="red" />
           <Text className="text-slate-800 font-semibold text-lg">Continue with Google</Text>
         </Link>
       </View>
