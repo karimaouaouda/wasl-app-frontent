@@ -28,7 +28,7 @@ export default function ActiveTab() {
         setLoading(true)
         setData(null)
         // fetch orders from the server
-        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders`, {
+        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/active`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Content-Type': 'application/json',
@@ -39,7 +39,9 @@ export default function ActiveTab() {
         }).then(res => {
             if (res.status === 200 || res.status === 201) {
                 return res.json()
-            } else {
+            } else if(res.status === 404) {
+                return {data: []}
+            }else{
                 console.log(res)
                 alert('error getting data click refresh button')
                 return null
@@ -49,8 +51,16 @@ export default function ActiveTab() {
                 setLoading(false)
                 if(json_data === null || !('data' in json_data)){
                     alert('no data for some reason')
+                    
+                } else if(json_data.data.length === 0){
+                    alert('no order yet')
+                    setData([])
+                }else{
+                    setData(json_data.data)
                 }
-                setData(json_data.data)
+
+                setLoading(false)
+   
             }).catch(err => {
                 setLoading(false)
                 console.error(err)
@@ -66,10 +76,10 @@ export default function ActiveTab() {
     // get current language
 
     function refreshData() {
+        setLoading(true)
         setData(null);
         setConfirmingQueue([]);
         setRejectingQueue([]);
-        console.log(confirmingQueue)
     }
 
     function acceptOrder(order_id: number|string){
