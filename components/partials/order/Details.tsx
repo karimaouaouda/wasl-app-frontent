@@ -15,12 +15,12 @@ export default function Details({order}: {order: Order}) {
         { id: 1, name: I18nManager.isRTL ? "تفاصيل الطلب" : "Order Details" },
     ];
 
-    function makePhoneCall() {
-        Linking.openURL(`tel:${order.restaurant_data[0].phone}`)
+    function makePhoneCall(phone: string|number) {
+        Linking.openURL(`tel:${phone}`)
     }
 
-    function makeWhatsCall() {
-        Linking.openURL(`whatsapp://send?text=Hello&phone=${order.restaurant_data[0].whatsapp}`)
+    function makeWhatsCall(phone: string|number) {
+        Linking.openURL(`whatsapp://send?text=Hello&phone=${phone}`)
     }
 
     // retrive the query param : order_id
@@ -53,7 +53,7 @@ export default function Details({order}: {order: Order}) {
                         </View>
                     </View>
                     <View className="flex flex-col gap-2">
-                        <TouchableOpacity onPress={makePhoneCall} className="bg-green-600 rounded-lg p-2">
+                        <TouchableOpacity onPress={() => makePhoneCall(order.restaurant_data[0].phone)} className="bg-green-600 rounded-lg p-2">
                             <IconSymbol name="phone" size={24} color="#fff" />
                         </TouchableOpacity>
                         <TouchableOpacity className="bg-red-600 rounded-lg p-2">
@@ -80,7 +80,7 @@ export default function Details({order}: {order: Order}) {
                     <View className="flex flex-row justify-start items-center mt-2">
                         <View className="flex flex-col justify-around items-start">
                             <Text className="text-sm font-semibold text-gray-500 ml-2">
-                                مهند
+                                {order.client_data[0].name}
                             </Text>
                             <Text className="text-sm font-semibold text-gray-500 ml-2">
                                 {I18nManager.isRTL ? "العننوان: الوصف المعنا " : "Address: Description"}
@@ -91,10 +91,10 @@ export default function Details({order}: {order: Order}) {
                         </View>
                     </View>
                     <View className="flex flex-col gap-2">
-                        <TouchableOpacity onPress={makePhoneCall} className="bg-green-600 rounded-lg p-2">
+                        <TouchableOpacity onPress={() => makePhoneCall(order.client_data[0].phone)} className="bg-green-600 rounded-lg p-2">
                             <IconSymbol name="phone" size={24} color="#fff" />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={makeWhatsCall} className="bg-sky-500 rounded-lg p-2">
+                        <TouchableOpacity onPress={() => makeWhatsCall(order.restaurant_data[0].whatsapp)} className="bg-sky-500 rounded-lg p-2">
                             <FontAwesome name="whatsapp" size={24} color="white" />
                         </TouchableOpacity>
                         <TouchableOpacity className="bg-red-600 rounded-lg p-2">

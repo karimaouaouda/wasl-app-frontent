@@ -28,7 +28,7 @@ export default function ActiveTab() {
         setLoading(true)
         setData(null)
         // fetch orders from the server
-        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders`, {
+        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/active`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Content-Type': 'application/json',
