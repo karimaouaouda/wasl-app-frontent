@@ -64,8 +64,49 @@ export default function ActiveTab() {
         setData(null);
     }
 
+    function acceptOrder(order_id: number|string){
+        setLoading(true)
+        let data: FormData = new FormData
+        data.append('order_id', order_id)
+        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/confirm`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${auth.getToken()}`,
+            },
+            method: 'POST',
+            body: data
+        }).then(res => {
+            if (res.status === 200 || res.status === 201) {
+                return res.json()
+            } else {
+                console.log(res)
+                alert('error confirming order click refresh button')
+                return null
+            }
+        })
+            .then(json_data => {
+                setLoading(false)
+                if(json_data === null){
+                    alert('no data for some reason')
+                }
+                if('success' in json_data){
+                    alert(json_data.success)
+                }
+            }).catch(err => {
+                setLoading(false)
+                console.error(err)
+            }
+        )
+    }
+
+    function rejectOrder(order_id: number|string){
+
+    }
+
     return (
-        <AuthManager>
+        <AuthManager refreshAction={refreshData}>
             <View className="toggle-button-wrapper flex flex-row justify-between">
                 <View className="flex flex-row items-center space-x-2">
                     <Switch
@@ -125,10 +166,13 @@ export default function ActiveTab() {
                                 </View>
                             </View>
                             <View className="buttons flex gap-4 flex-row items-center mt-4">
-                                <TouchableOpacity className="bg-green-500 rounded-lg p-2 flex-1">
+                                <TouchableOpacity onPress={() => acceptOrder(item.id)}
+                                    className="bg-green-500 rounded-lg p-2 flex-1">
                                     <Text className="text-white text-center font-semibold">{I18nManager.isRTL ? "تأكيد" : "Confirm"}</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity className="bg-red-500 rounded-lg p-2 flex-1">
+                                <TouchableOpacity 
+                                    onPress={() => rejectOrder(item.id)}
+                                    className="bg-red-500 rounded-lg p-2 flex-1">
                                     <Text className="text-white text-center font-semibold">{I18nManager.isRTL ? "رفض" : "reject"}</Text>
                                 </TouchableOpacity>
                             </View>
@@ -136,10 +180,6 @@ export default function ActiveTab() {
                     </Link>
                 ))}
             </View>
-
-            <Text>
-                try
-            </Text>
         </AuthManager>
     )
 }
