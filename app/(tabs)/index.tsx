@@ -28,7 +28,7 @@ export default function ActiveTab() {
         setLoading(true)
         setData(null)
         // fetch orders from the server
-        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/active`, {
+        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Content-Type': 'application/json',
@@ -40,6 +40,7 @@ export default function ActiveTab() {
             if (res.status === 200 || res.status === 201) {
                 return res.json()
             } else if(res.status === 404) {
+                console.log(res)
                 return {data: []}
             }else{
                 console.log(res)
@@ -114,6 +115,7 @@ export default function ActiveTab() {
                 }
 
                 if('success' in json_data){
+                    loadOrders()
                     alert(json_data.success)
                 }
 

@@ -37,7 +37,7 @@ export default function TabLayout() {
         name="today"
         options={{
           title: 'Today',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="checklist" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="delivery-dining" color={color} />,
         }}
       />
       <Tabs.Screen

@@ -58,4 +58,16 @@ export default class Auth{
             return false
         })
     }
+
+    async reset(){
+        this.#token = null
+        this.#user_id = null
+        await SecureStore.deleteItemAsync('token').then(() => {
+            console.log("Token removed from secure storage")
+        })
+
+        await SecureStore.deleteItemAsync('user_id').then(() => {
+            console.log("User id removed from secure storage")
+        })
+    }
 }

@@ -16,6 +16,8 @@ export default function GuestManager({children}: {children: React.ReactNode}) {
         alert('login')
     }
 
+    
+
     useEffect(() => {
         // on every guest screen we must check if he is logged in or not
         // if he is logged in we redirect him to the tabs page
@@ -33,7 +35,7 @@ export default function GuestManager({children}: {children: React.ReactNode}) {
     }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView >
         <ScrollView className="w-screen h-screen bg-[#fb6f16]">
             {children}
         </ScrollView>
