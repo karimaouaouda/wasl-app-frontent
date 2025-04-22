@@ -5,8 +5,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useState } from "react";
 import { Linking } from "react-native";
 import '@/global.css'
+import Order from "@/types";
 
-export default function Details() {
+export default function Details({order}: {order: Order}) {
     const [tab, setTab] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
     const tabs = [
@@ -15,11 +16,11 @@ export default function Details() {
     ];
 
     function makePhoneCall() {
-        Linking.openURL('tel:+213655766709')
+        Linking.openURL(`tel:${order.restaurant_data[0].phone}`)
     }
 
     function makeWhatsCall() {
-        Linking.openURL('whatsapp://send?text=Hello&phone=+213655766709')
+        Linking.openURL(`whatsapp://send?text=Hello&phone=${order.restaurant_data[0].whatsapp}`)
     }
 
     // retrive the query param : order_id
@@ -36,12 +37,12 @@ export default function Details() {
                     <View className="flex flex-row justify-start items-center mt-2">
                         <Image
                             style={{ objectFit: 'contain' }}
-                            source={require('@/assets/images/custom/logo.png')} // Replace with your image URL
+                            source={{uri: order.restaurant_data[0].logo_url}} // Replace with your image URL
                             className="w-14 h-20"
                         />
                         <View className="flex flex-col justify-around items-start">
                             <Text className="text-sm font-semibold text-gray-500 ml-2">
-                                Mandimajeed
+                                {order.restaurant_data[0].name}
                             </Text>
                             <Text className="text-sm font-semibold text-gray-500 ml-2">
                                 {I18nManager.isRTL ? "الإستلام: فرع القيروان" : "Pickup: Al-Qayrawan Branch"}

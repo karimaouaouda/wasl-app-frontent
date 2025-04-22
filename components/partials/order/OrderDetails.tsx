@@ -5,22 +5,15 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useState } from "react";
 import { Linking } from "react-native";
 import '@/global.css'
+import Order from "@/types";
 
-export default function OrderDetails() {
+export default function OrderDetails({order}: {order: Order}) {
     const [tab, setTab] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
     const tabs = [
         { id: 0, name: I18nManager.isRTL ? "التفاصيل" : "Details" },
         { id: 1, name: I18nManager.isRTL ? "تفاصيل الطلب" : "Order Details" },
     ];
-
-    function makePhoneCall() {
-        Linking.openURL('tel:+213655766709')
-    }
-
-    function makeWhatsCall() {
-        Linking.openURL('whatsapp://send?text=Hello&phone=+213655766709')
-    }
 
     // retrive the query param : order_id
     const local = useLocalSearchParams();
@@ -65,7 +58,7 @@ export default function OrderDetails() {
                         {I18nManager.isRTL ? 'المجموع:' : 'Total'}
                     </Text>
                     <Text className="text-slate-700 text-sm font-semibold">
-                        1783.35 SAR
+                        {order.total.toFixed(2)} SAR
                     </Text>
                 </View>
                 <View className="w-full flex flex-row justify-between items-center">
@@ -91,7 +84,7 @@ export default function OrderDetails() {
                     {I18nManager.isRTL ? 'الإجمالي:' : 'Total:'}
                 </Text>
                 <Text className="text-slate-700 text-sm font-semibold">
-                    1833.35 SAR
+                    {Number(order.total.toFixed(2) + 50 + 20).toFixed(2)} SAR
                 </Text>
             </View>
         </View>

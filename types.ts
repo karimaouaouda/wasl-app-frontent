@@ -20,15 +20,32 @@ interface Restaurant{
     phone: string;
     whatsapp?: string;
     logo_url?: string;
+    description?: string;
+    delivery_time?: string;
+}
+
+interface Client{
+    name: string;
+    phone: string;
+    whatsapp?: string;
+    address?: string;
+    estimated_delivery_time?: string;
 }
 
 interface Order{
     id: number;
     status: string;
     restaurant_data: Restaurant[];
+    client_data: Client[];
     total: number;
     created_at: string;
     updated_at: string;
+    items: OrderItem[];
+}
+
+export interface OrderData{
+    order: Order;
+    restaurant: Restaurant;
     order_items: OrderItem[];
 }
 

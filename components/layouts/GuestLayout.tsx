@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import Auth from '@/services/authservice'
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 
 export default function GuestManager({children}: {children: React.ReactNode}) {
     // This is the guest layout component that wraps the children components in a scrollable view with a specific background color.
@@ -11,6 +11,8 @@ export default function GuestManager({children}: {children: React.ReactNode}) {
 
 
     const auth = new Auth()
+
+    const router = useRouter()
 
     function login(){
         alert('login')
@@ -31,7 +33,7 @@ export default function GuestManager({children}: {children: React.ReactNode}) {
             }
         }
 
-        checkAuth()
+        setTimeout( checkAuth, 1000)
     }, []);
 
   return (

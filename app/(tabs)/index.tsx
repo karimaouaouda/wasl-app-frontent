@@ -209,7 +209,7 @@ export default function ActiveTab() {
 
             <View className="flex flex-col gap-2 mt-4 mb-10">
                 {data && data.map((item, index) => (
-                    <Link key={Math.ceil(Math.random() * 1000)} href={"/order/OrderView?order_id=5"} className="w-full block">
+                    <Link key={Math.ceil(Math.random() * 1000)} href={"/order/OrderView?order_id=" + item.id} className="w-full block">
                         <View className="bg-white p-4 rounded-lg shadow-md w-full">
                             <View className="flex flex-row justify-between items-center">
                                 <Text className="text-green-500 text-sm border rounded-lg p-2">
