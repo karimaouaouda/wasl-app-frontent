@@ -7,13 +7,15 @@ import { Linking } from "react-native";
 import '@/global.css'
 import Order from "@/types";
 
-export default function OrderDetails({order}: {order: Order}) {
+export default function OrderDetails({ order }: { order: Order }) {
     const [tab, setTab] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
     const tabs = [
         { id: 0, name: I18nManager.isRTL ? "التفاصيل" : "Details" },
         { id: 1, name: I18nManager.isRTL ? "تفاصيل الطلب" : "Order Details" },
     ];
+
+    console.log('there is : ' + order.items.length)
 
     // retrive the query param : order_id
     const local = useLocalSearchParams();
@@ -37,19 +39,24 @@ export default function OrderDetails({order}: {order: Order}) {
                 </Text>
             </View>
 
-            <View className="w-full py-2 flex flex-row justify-between items-center px-2">
-                <View className="flex flex-row justify-start items-center gap-4">
-                    <Text className="text-slate-700 text-sm w-10">
-                        x2
-                    </Text>
-                    <Text className="text-slate-700 text-sm ">
-                        {I18nManager.isRTL ? 'الصنف' : 'Item'}
-                    </Text>
-                </View>
+            <View className="w-full py-2 flex flex-col items-center px-2">
+                {order.items && order.items.length > 0 ?
+                    order.items.map(function (item) {
+                        return (
+                            <View key={Math.ceil(Math.random() * 1000)} className="w-full flex justify-between flex-row items-center">
+                                <View className="flex flex-row justify-start items-center gap-4">
+                                    <Text className="text-slate-700 text-sm w-10">
+                                        x{item.quantity}
+                                    </Text>
+                                    <Text className="text-slate-700 text-sm ">
+                                        {item.item_name}
+                                    </Text>
+                                </View>
 
-                <Text className="text-slate-700 text-sm">
-                    {I18nManager.isRTL ? 'السعر' : 'Price'}
-                </Text>
+                                <Text className="text-slate-700 text-sm">
+                                    {item.price.toFixed(2)} SAR
+                                </Text></View>)
+                    }) : <Text className="text-center py-2 font-semibold text-slate-500">no item found</Text>}
             </View>
 
             <View className="w-full border-t border-b pb-2 border-gray-200 mt-2 flex flex-col gap-2">
