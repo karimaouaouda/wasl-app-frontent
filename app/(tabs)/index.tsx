@@ -6,7 +6,8 @@ import { Link, router } from "expo-router";
 import AuthManager from "@/components/layouts/AuthLayout";
 import Order from "@/types";
 import Auth from "@/services/authservice";
-import { AnimatedKeyboardInfo } from "react-native-reanimated";
+import Pusher from 'pusher-js/react-native';
+import Echo from 'laravel-echo';
 
 
 export default function ActiveTab() {
@@ -14,8 +15,22 @@ export default function ActiveTab() {
     const [isEnabled, setIsEnabled] = useState(false);
     const [data, setData] = useState<null | Array<Order>>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [confirmingQueue, setConfirmingQueue] = useState<Array<string|number>>([]);
-    const [rejectingQueue, setRejectingQueue] = useState<Array<string|number>>([]);
+    const [confirmingQueue, setConfirmingQueue] = useState<Array<string | number>>([]);
+    const [rejectingQueue, setRejectingQueue] = useState<Array<string | number>>([]);
+
+    const pusher = window.Pusher = Pusher;
+
+    const echo = window.Echo = new Echo({
+        broadcaster: 'reverb',
+        key: 'kzapg79rumofutkwh48h',
+        wsHost: '192.168.1.36',
+        wsPort: 8080,
+        wssPort: 443,
+        forceTLS: false,
+        enabledTransports: ['ws', 'wss'],
+    });
+
+    
 
     const toggleSwitch = () => {
         setData(null);
@@ -24,7 +39,7 @@ export default function ActiveTab() {
 
     const auth = new Auth()
 
-    function loadOrders(){
+    function loadOrders() {
         setLoading(true)
         setData(null)
         // fetch orders from the server
@@ -39,10 +54,10 @@ export default function ActiveTab() {
         }).then(res => {
             if (res.status === 200 || res.status === 201) {
                 return res.json()
-            } else if(res.status === 404) {
+            } else if (res.status === 404) {
                 console.log(res)
-                return {data: []}
-            }else{
+                return { data: [] }
+            } else {
                 console.log(res)
                 alert('error getting data click refresh button')
                 return null
@@ -50,28 +65,42 @@ export default function ActiveTab() {
         })
             .then(json_data => {
                 setLoading(false)
-                if(json_data === null || !('data' in json_data)){
+                if (json_data === null || !('data' in json_data)) {
                     alert('no data for some reason')
-                    
-                } else if(json_data.data.length === 0){
+
+                } else if (json_data.data.length === 0) {
                     alert('no order yet')
                     setData([])
-                }else{
+                } else {
                     setData(json_data.data)
                 }
 
                 setLoading(false)
-   
+
             }).catch(err => {
                 setLoading(false)
                 console.error(err)
             })
     }
     useEffect(() => {
-        if(!data){
+        if (!data) {
             console.log('gettting data ...')
             loadOrders()
         }
+
+        echo.channel('order.created')
+        .listen('OrderCreated', (e: any) => {
+            alert('new order created')
+            console.log(e)
+        }).error((error: any) => {
+            console.error('Error:', error);
+        })
+
+        echo.channel('order.created')
+        .listen('App\Events\OrderCreated', (e: any) => {
+            alert('new order created')
+            console.log(e)
+        })
     }, [data, isEnabled]); // add isEnabled to the dependency array to refetch data when it changes
 
     // get current language
@@ -83,11 +112,11 @@ export default function ActiveTab() {
         setRejectingQueue([]);
     }
 
-    function acceptOrder(order_id: number|string){
+    function acceptOrder(order_id: number | string) {
         // push the order id to confirming queue
         setConfirmingQueue([...confirmingQueue, order_id])
 
-        
+
 
         let id: FormData = new FormData
         id.append('order_id', `${order_id}`)
@@ -110,11 +139,11 @@ export default function ActiveTab() {
         })
             .then(json_data => {
                 setLoading(false)
-                if(json_data === null){
+                if (json_data === null) {
                     alert('no data for some reason')
                 }
 
-                if('success' in json_data){
+                if ('success' in json_data) {
                     loadOrders()
                     alert(json_data.success)
                 }
@@ -134,59 +163,59 @@ export default function ActiveTab() {
                     setConfirmingQueue(confirmingQueue.filter((item) => item !== order_id))
                 }
             }
-        )
+            )
     }
 
-    function rejectOrder(order_id: number|string){
-         // push the order id to confirming queue
-         setRejectingQueue([...rejectingQueue, order_id])
+    function rejectOrder(order_id: number | string) {
+        // push the order id to confirming queue
+        setRejectingQueue([...rejectingQueue, order_id])
 
-        
 
-         let id: FormData = new FormData
-         id.append('order_id', `${order_id}`)
-         fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/confirm`, {
-             headers: {
-                 'X-Requested-With': 'XMLHttpRequest',
-                 'Authorization': `Bearer ${auth.getToken()}`,
-                 contentType: 'application/json'
-             },
-             method: 'POST',
-             body: id
-         }).then(res => {
-             if (res.status === 200 || res.status === 201 || 400) {
-                 return res.json()
-             } else {
-                 console.log(res)
-                 alert('error confirming order click refresh button')
-                 return null
-             }
-         })
-             .then(json_data => {
-                 setLoading(false)
-                 if(json_data === null){
-                     alert('no data for some reason')
-                 }
- 
-                 if('success' in json_data){
-                     alert(json_data.success)
-                 }
-                 
-                 //remove order_id from confirming queue
-                 if (confirmingQueue !== null) {
-                     setRejectingQueue(rejectingQueue.filter((item) => item !== order_id))
-                 }
- 
-                 alert('the order is already finshed')
-                 refreshData()
-             }).catch(err => {
-                 setLoading(false)
-                 //remove order_id from confirming queue
-                 if (confirmingQueue !== null) {
+
+        let id: FormData = new FormData
+        id.append('order_id', `${order_id}`)
+        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/confirm`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Authorization': `Bearer ${auth.getToken()}`,
+                contentType: 'application/json'
+            },
+            method: 'POST',
+            body: id
+        }).then(res => {
+            if (res.status === 200 || res.status === 201 || 400) {
+                return res.json()
+            } else {
+                console.log(res)
+                alert('error confirming order click refresh button')
+                return null
+            }
+        })
+            .then(json_data => {
+                setLoading(false)
+                if (json_data === null) {
+                    alert('no data for some reason')
+                }
+
+                if ('success' in json_data) {
+                    alert(json_data.success)
+                }
+
+                //remove order_id from confirming queue
+                if (confirmingQueue !== null) {
                     setRejectingQueue(rejectingQueue.filter((item) => item !== order_id))
-                 }
-             }
-         )
+                }
+
+                alert('the order is already finshed')
+                refreshData()
+            }).catch(err => {
+                setLoading(false)
+                //remove order_id from confirming queue
+                if (confirmingQueue !== null) {
+                    setRejectingQueue(rejectingQueue.filter((item) => item !== order_id))
+                }
+            }
+            )
     }
 
     return (
@@ -202,7 +231,7 @@ export default function ActiveTab() {
                     />
                     <Text className={"text-sm font-semibold " + (isEnabled ? 'text-green-500' : 'text-slate-800')}>{I18nManager.isRTL ? "متاح" : "Active"}</Text>
                 </View>
-                {loading? <ActivityIndicator/> : <TouchableOpacity onPress={refreshData}>
+                {loading ? <ActivityIndicator /> : <TouchableOpacity onPress={refreshData}>
                     <IconSymbol className="text-green-500" name="cached" size={24} color="#767577" />
                 </TouchableOpacity>}
             </View>
@@ -253,7 +282,7 @@ export default function ActiveTab() {
                                 <TouchableOpacity disabled={confirmingQueue?.includes(item.id)}
                                     onPress={() => acceptOrder(item.id)}
                                     className="bg-green-500 rounded-lg p-2 flex-1">
-                                    {confirmingQueue?.includes(item.id)? 
+                                    {confirmingQueue?.includes(item.id) ?
                                         <ActivityIndicator color="white" size={20} /> :
                                         <Text className="text-white text-center font-semibold">{I18nManager.isRTL ? "تأكيد" : "Confirm"}</Text>}
                                 </TouchableOpacity>
@@ -261,7 +290,7 @@ export default function ActiveTab() {
                                     disabled={rejectingQueue?.includes(item.id)}
                                     onPress={() => rejectOrder(item.id)}
                                     className="bg-red-500 rounded-lg p-2 flex-1">
-                                    {rejectingQueue?.includes(item.id)? 
+                                    {rejectingQueue?.includes(item.id) ?
                                         <ActivityIndicator color="white" size={20} /> :
                                         <Text className="text-white text-center font-semibold">{I18nManager.isRTL ? "رفض" : "reject"}</Text>}
                                 </TouchableOpacity>

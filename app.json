@@ -40,6 +40,18 @@
     "plugins": [
       "expo-localization",
       [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#232323",
+          "image": "./assets/images/favicon.png",
+          "dark": {
+            "image": "./assets/splash-icon-dark.png",
+            "backgroundColor": "#000000"
+          },
+          "imageWidth": 200
+        }
+      ],
+      [
         "expo-secure-store",
       {
         "configureAndroidBackup": true

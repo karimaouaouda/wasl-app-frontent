@@ -1,20 +1,32 @@
 import { View, Text, I18nManager, Image, TouchableOpacity, RefreshControl, ActivityIndicator } from "react-native";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Linking } from "react-native";
 import Details from "@/components/partials/order/Details";
 import OrderDetails from "@/components/partials/order/OrderDetails";
 import AuthManager from "@/components/layouts/AuthLayout";
-
+import * as SplashScreen from "expo-splash-screen";
 import Order, { OrderData } from "@/types";
 import Auth from "@/services/authservice";
+
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
+
+// Set the animation options. This is optional.
+SplashScreen.setOptions({
+  duration: 2000,
+  fade: true,
+  
+});
 
 export default function OrderView() {
     //define constants
     const [tab, setTab] = useState(0);
     const [loading, setLoading] = useState(false);
     const [orderData, setOrderData] = useState<Order | null>(null);
+    const [appIsReady, setAppIsReady] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const tabs = [
         { id: 0, name: I18nManager.isRTL ? "التفاصيل" : "Details" },
@@ -87,15 +99,47 @@ export default function OrderView() {
         }
 
         // if orderData is null then load the order data
-        if (!orderData) {
-            loadOrderData()
+
+
+        async function prepare() {
+            try {
+                // Pre-load fonts, make any API calls you need to do here
+                if (!orderData) {
+                    loadOrderData()
+                }
+                // Artificially delay for two seconds to simulate a slow loading
+                // experience. Remove this if you copy and paste the code!
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            } catch (e) {
+                console.warn(e);
+            } finally {
+                // Tell the application to render
+                setAppIsReady(true);
+            }
         }
+
+        prepare();
 
     }, [orderData]);
 
 
     function refreshPage() {
         setOrderData(null)
+    }
+
+    const onLayoutRootView = useCallback(() => {
+        if (appIsReady) {
+            // This tells the splash screen to hide immediately! If we call this after
+            // `setAppIsReady`, then we may see a blank screen while the app is
+            // loading its initial state and rendering its first pixels. So instead,
+            // we hide the splash screen once we know the root view has already
+            // performed layout.
+            SplashScreen.hide();
+        }
+    }, [appIsReady]);
+
+    if (!appIsReady) {
+        return null;
     }
 
     return (
@@ -147,7 +191,7 @@ export default function OrderView() {
                     <View className="w-full bg-white rounded-md flex flex-row justify-between items-center mt-4 px-2 shadow-md">
                         <Image
                             style={{ objectFit: 'contain' }}
-                            source={{uri: orderData.restaurant_data[0].logo_url}} // Replace with your image URL
+                            source={{ uri: orderData.restaurant_data[0].logo_url }} // Replace with your image URL
                             className="w-14 h-20" />
 
                         <View className="flex flex-col space-y-1 border border-green-500 rounded-lg p-2">
