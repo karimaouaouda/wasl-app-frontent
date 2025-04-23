@@ -24,8 +24,8 @@ export default function ActiveTab() {
     const echo = window.Echo = new Echo({
         broadcaster: 'reverb',
         key: 'kzapg79rumofutkwh48h',
-        wsHost: '192.168.1.37',
-        wsPort: 8080,
+        wsHost: process.env.EXPO_PUBLIC_WS_HOST,
+        wsPort: process.env.EXPO_PUBLIC_WS_PORT,
         wssPort: 443,
         forceTLS: false,
         enabledTransports: ['ws', 'wss'],
