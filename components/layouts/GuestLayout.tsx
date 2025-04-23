@@ -55,7 +55,7 @@ export default function GuestManager({children}: {children: React.ReactNode}) {
             }
         }
 
-        prepare();
+        setTimeout(prepare, 1000)
     }, []);
 
     const onLayoutRootView = useCallback(() => {
@@ -80,4 +80,4 @@ export default function GuestManager({children}: {children: React.ReactNode}) {
         </ScrollView>
     </SafeAreaView>
   );
-}
+} 

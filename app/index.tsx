@@ -2,7 +2,6 @@ import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { I18nManager, Image, Text, View } from "react-native";
 import '@/global.css';
-import AuthManager from "@/components/layouts/AuthLayout";
 import GuestManager from "@/components/layouts/GuestLayout";
 
 export default function Index() {

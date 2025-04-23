@@ -13,35 +13,36 @@ import Echo from 'laravel-echo';
 export default function ActiveTab() {
     // initilize states
     const [isEnabled, setIsEnabled] = useState(false);
-    const [data, setData] = useState<null | Array<Order>>(null);
+    const [data, setData] = useState<Array<Order>>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [confirmingQueue, setConfirmingQueue] = useState<Array<string | number>>([]);
     const [rejectingQueue, setRejectingQueue] = useState<Array<string | number>>([]);
+    const [isConnected, setIsConnected] = useState(false);
 
     const pusher = window.Pusher = Pusher;
 
     const echo = window.Echo = new Echo({
         broadcaster: 'reverb',
         key: 'kzapg79rumofutkwh48h',
-        wsHost: '192.168.1.36',
+        wsHost: '192.168.1.37',
         wsPort: 8080,
         wssPort: 443,
         forceTLS: false,
         enabledTransports: ['ws', 'wss'],
     });
 
-    
+
 
     const toggleSwitch = () => {
-        setData(null);
+        setData([]);
         setIsEnabled(previousState => !previousState);
     }
 
     const auth = new Auth()
 
     function loadOrders() {
+        console.log('loading orders')
         setLoading(true)
-        setData(null)
         // fetch orders from the server
         fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/active`, {
             headers: {
@@ -59,57 +60,56 @@ export default function ActiveTab() {
                 return { data: [] }
             } else {
                 console.log(res)
-                alert('error getting data click refresh button')
-                return null
+                return null 
             }
         })
             .then(json_data => {
                 setLoading(false)
                 if (json_data === null || !('data' in json_data)) {
-                    alert('no data for some reason')
+                    setData([])
 
                 } else if (json_data.data.length === 0) {
-                    alert('no order yet')
                     setData([])
                 } else {
                     setData(json_data.data)
                 }
-
-                setLoading(false)
-
             }).catch(err => {
                 setLoading(false)
-                console.error(err)
             })
     }
     useEffect(() => {
-        if (!data) {
-            console.log('gettting data ...')
+        if (data.length === 0) {
             loadOrders()
         }
 
-        echo.channel('order.created')
-        .listen('OrderCreated', (e: any) => {
-            alert('new order created')
-            console.log(e)
-        }).error((error: any) => {
-            console.error('Error:', error);
-        })
+        if (!isConnected) {
+            echo.channel('order.created')
+                .listen('OrderCreated', (e: any) => {
+                    refreshData()
+                    console.log('order created')
+                }).error((error: any) => {
+                    console.error('Error:', error);
+                })
 
-        echo.channel('order.created')
-        .listen('App\Events\OrderCreated', (e: any) => {
-            alert('new order created')
-            console.log(e)
-        })
-    }, [data, isEnabled]); // add isEnabled to the dependency array to refetch data when it changes
+            echo.channel('order.accepted')
+                .listen('OrderAccepted', (e: any) => {
+                    refreshData()
+                    console.log('order accepted')
+                }).error((error: any) => {
+                    console.error('Error:', error);
+                })
+
+            setIsConnected(true)
+        }
+    }, [isEnabled]); // add isEnabled to the dependency array to refetch data when it changes
 
     // get current language
 
     function refreshData() {
-        setLoading(true)
-        setData(null);
+        console.log('refershing...')
         setConfirmingQueue([]);
-        setRejectingQueue([]);
+        setRejectingQueue([])
+        loadOrders()
     }
 
     function acceptOrder(order_id: number | string) {
@@ -133,27 +133,22 @@ export default function ActiveTab() {
                 return res.json()
             } else {
                 console.log(res)
-                alert('error confirming order click refresh button')
                 return null
             }
         })
             .then(json_data => {
                 setLoading(false)
                 if (json_data === null) {
-                    alert('no data for some reason')
                 }
 
                 if ('success' in json_data) {
                     loadOrders()
-                    alert(json_data.success)
                 }
 
                 //remove order_id from confirming queue
                 if (confirmingQueue !== null) {
                     setConfirmingQueue(confirmingQueue.filter((item) => item !== order_id))
                 }
-
-                alert('the order is already finshed')
                 refreshData()
             }).catch(err => {
                 setLoading(false)
@@ -187,18 +182,15 @@ export default function ActiveTab() {
                 return res.json()
             } else {
                 console.log(res)
-                alert('error confirming order click refresh button')
                 return null
             }
         })
             .then(json_data => {
                 setLoading(false)
                 if (json_data === null) {
-                    alert('no data for some reason')
                 }
 
                 if ('success' in json_data) {
-                    alert(json_data.success)
                 }
 
                 //remove order_id from confirming queue
@@ -206,7 +198,6 @@ export default function ActiveTab() {
                     setRejectingQueue(rejectingQueue.filter((item) => item !== order_id))
                 }
 
-                alert('the order is already finshed')
                 refreshData()
             }).catch(err => {
                 setLoading(false)
@@ -237,7 +228,7 @@ export default function ActiveTab() {
             </View>
 
             <View className="flex flex-col gap-2 mt-4 mb-10">
-                {data && data.map((item, index) => (
+                {data.length > 0 && data.map((item, index) => (
                     <Link key={Math.ceil(Math.random() * 1000)} href={"/order/OrderView?order_id=" + item.id} className="w-full block">
                         <View className="bg-white p-4 rounded-lg shadow-md w-full">
                             <View className="flex flex-row justify-between items-center">
@@ -298,6 +289,8 @@ export default function ActiveTab() {
                         </View>
                     </Link>
                 ))}
+
+                {data.length == 0 && (loading ? <ActivityIndicator color="green" size={'large'} /> : <Text className="text-center py-4 font-semibold text-red-500">{I18nManager.isRTL ? "لا توجد طلبات" : "No Orders Yet"}</Text>)}
             </View>
         </AuthManager>
     )

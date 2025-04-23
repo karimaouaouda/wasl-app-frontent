@@ -29,6 +29,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          tabBarActiveTintColor: 'dodgerblue',
+          tabBarInactiveTintColor: '#687076',
           title: 'Active',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name={"home"} color={color} />,
         }}
@@ -36,6 +38,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="today"
         options={{
+          tabBarActiveTintColor: 'dodgerblue',
+          tabBarInactiveTintColor: '#687076',
           title: 'Today',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="delivery-dining" color={color} />,
         }}
@@ -43,6 +47,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="finished"
         options={{
+          tabBarActiveTintColor: 'dodgerblue',
+          tabBarInactiveTintColor: '#687076',
           title: 'Finished',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="checklist" color={color} />,
         }}
@@ -50,6 +56,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
+          tabBarActiveTintColor: 'dodgerblue',
+          tabBarInactiveTintColor: '#687076',
           title: 'Profile',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="account-circle" color={color} />,
         }}

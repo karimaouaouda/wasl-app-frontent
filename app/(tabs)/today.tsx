@@ -6,19 +6,17 @@ import { Link, router } from "expo-router";
 import AuthManager from "@/components/layouts/AuthLayout";
 import Order from "@/types";
 import Auth from "@/services/authservice";
-import { AnimatedKeyboardInfo } from "react-native-reanimated";
 
 
 export default function TodayTab() {
     // initilize states
     const [isEnabled, setIsEnabled] = useState(false);
-    const [data, setData] = useState<null | Array<Order>>(null);
+    const [data, setData] = useState<Array<Order>>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [confirmingQueue, setConfirmingQueue] = useState<Array<string | number>>([]);
-    const [rejectingQueue, setRejectingQueue] = useState<Array<string | number>>([]);
+    const [finishQueue, setFinishQueue] = useState<Array<number | string>>([])
 
     const toggleSwitch = () => {
-        setData(null);
+        setData([]);
         setIsEnabled(previousState => !previousState);
     }
 
@@ -26,9 +24,7 @@ export default function TodayTab() {
 
 
     function loadOrders() {
-        console.log(auth.getToken())
         setLoading(true)
-        setData(null)
         // fetch orders from the server
         fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/1/today`, {
             headers: {
@@ -54,8 +50,7 @@ export default function TodayTab() {
             }
         })
             .then(json_data => {
-                setLoading(false)
-                if (json_data === null || !('data' in json_data)) {
+                if (json_data === null || !((typeof(json_data) == 'object') && ('data' in json_data))) {
                     alert('no data for some reason')
 
                 } else if (json_data.data.length === 0) {
@@ -77,26 +72,24 @@ export default function TodayTab() {
             console.log('gettting data ...')
             loadOrders()
         }
-    }, [data, isEnabled]); // add isEnabled to the dependency array to refetch data when it changes
+    }, [isEnabled]); // add isEnabled to the dependency array to refetch data when it changes
 
     // get current language
 
     function refreshData() {
+        loadOrders()
+    }
+
+    function finishOrder(order_id: number | string) {
+        // add the order to the queue
+        setFinishQueue([...finishQueue, order_id])
+
+
         setLoading(true)
-        setData(null);
-        setConfirmingQueue([]);
-        setRejectingQueue([]);
-    }
-
-    function acceptOrder(order_id: number | string) {
-        // push the order id to confirming queue
-        setConfirmingQueue([...confirmingQueue, order_id])
-
-
-
         let id: FormData = new FormData
         id.append('order_id', `${order_id}`)
-        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/confirm`, {
+
+        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/complete`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Authorization': `Bearer ${auth.getToken()}`,
@@ -108,6 +101,10 @@ export default function TodayTab() {
             if (res.status === 200 || res.status === 201 || 400) {
                 return res.json()
             } else {
+                if (res.status === 401) {
+                    auth.reset()
+                    router.replace('/auth/login')
+                }
                 console.log(res)
                 alert('error confirming order click refresh button')
                 return null
@@ -119,79 +116,18 @@ export default function TodayTab() {
                     alert('no data for some reason')
                 }
 
-                if ('success' in json_data) {
-                    loadOrders()
+                if (typeof(json_data) == 'object' && 'success' in json_data) {
                     alert(json_data.success)
                 }
 
-                //remove order_id from confirming queue
-                if (confirmingQueue !== null) {
-                    setConfirmingQueue(confirmingQueue.filter((item) => item !== order_id))
-                }
-
-                alert('the order is already finshed')
                 refreshData()
             }).catch(err => {
                 setLoading(false)
-                console.error(err, confirmingQueue, rejectingQueue)
-                //remove order_id from confirming queue
-                if (confirmingQueue !== null) {
-                    setConfirmingQueue(confirmingQueue.filter((item) => item !== order_id))
-                }
-            }
-            )
-    }
-
-    function rejectOrder(order_id: number | string) {
-        // push the order id to confirming queue
-        setRejectingQueue([...rejectingQueue, order_id])
-
-
-
-        let id: FormData = new FormData
-        id.append('order_id', `${order_id}`)
-        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/confirm`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Authorization': `Bearer ${auth.getToken()}`,
-                contentType: 'application/json'
-            },
-            method: 'POST',
-            body: id
-        }).then(res => {
-            if (res.status === 200 || res.status === 201 || 400) {
-                return res.json()
-            } else {
-                console.log(res)
-                alert('error confirming order click refresh button')
-                return null
-            }
-        })
-            .then(json_data => {
-                setLoading(false)
-                if (json_data === null) {
-                    alert('no data for some reason')
-                }
-
-                if ('success' in json_data) {
-                    alert(json_data.success)
-                }
-
-                //remove order_id from confirming queue
-                if (confirmingQueue !== null) {
-                    setRejectingQueue(rejectingQueue.filter((item) => item !== order_id))
-                }
-
-                alert('the order is already finshed')
-                refreshData()
-            }).catch(err => {
-                setLoading(false)
-                //remove order_id from confirming queue
-                if (confirmingQueue !== null) {
-                    setRejectingQueue(rejectingQueue.filter((item) => item !== order_id))
-                }
-            }
-            )
+            })
+            .finally(() => {
+                // remove the order from the queue
+                setFinishQueue(finishQueue.filter((item) => item !== order_id))
+            })
     }
 
     return (
@@ -256,15 +192,19 @@ export default function TodayTab() {
                             </View>
                             <View className="buttons flex gap-4 flex-row items-center mt-4">
                                 <TouchableOpacity
+                                    disabled={finishQueue.includes(item.id)}
+                                    onPress={() => finishOrder(item.id)}
                                     className="bg-green-500 w-2/3 mx-auto p-2 rounded-lg flex flex-row items-center justify-center">
                                     <Text className="text-white text-md font-semibold">
-                                        Finish
+                                        {finishQueue.includes(item.id) ? <ActivityIndicator color="white" size={20} /> : I18nManager.isRTL ? "إنهاء الطلب" : "Finish Order"}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
                     </Link>
                 ))}
+
+                {data.length == 0 && (loading ? <ActivityIndicator color="green" size={'large'} /> : <Text className="text-center py-4 font-semibold text-red-500">{I18nManager.isRTL ? "لا توجد طلبات" : "No Orders Yet"}</Text>)}
             </View>
         </AuthManager>
     )
