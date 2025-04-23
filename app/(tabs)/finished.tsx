@@ -45,16 +45,13 @@ export default function TodayTab() {
                 router.replace('/auth/login')
             } else {
                 console.log(res)
-                alert('error getting data click refresh button')
                 return null
             }
         })
             .then(json_data => {
                 if (json_data === null || !('data' in json_data)) {
-                    alert('no data for some reason')
 
                 } else if (json_data.data.length === 0) {
-                    alert('no order yet')
                     setData([])
                 } else {
                     setData(json_data.data)
@@ -106,14 +103,12 @@ export default function TodayTab() {
                     router.replace('/auth/login')
                 }
                 console.log(res)
-                alert('error confirming order click refresh button')
                 return null
             }
         })
             .then(json_data => {
                 setLoading(false)
                 if (json_data === null) {
-                    alert('no data for some reason')
                 }
 
                 if ('success' in json_data) {
@@ -189,16 +184,6 @@ export default function TodayTab() {
                                         {I18nManager.isRTL ? "وقت التوصيل: 05/04/2025 - 14:05" : "Delivery Time: 05/04/2025 - 14:05"}
                                     </Text>
                                 </View>
-                            </View>
-                            <View className="buttons flex gap-4 flex-row items-center mt-4">
-                                <TouchableOpacity
-                                    disabled={finishQueue.includes(item.id)}
-                                    onPress={() => finishOrder(item.id)}
-                                    className="bg-green-500 w-2/3 mx-auto p-2 rounded-lg flex flex-row items-center justify-center">
-                                    <Text className="text-white text-md font-semibold">
-                                        {finishQueue.includes(item.id) ? <ActivityIndicator color="white" size={20} /> : I18nManager.isRTL ? "إنهاء الطلب" : "Finish Order"}
-                                    </Text>
-                                </TouchableOpacity>
                             </View>
                         </View>
                     </Link>

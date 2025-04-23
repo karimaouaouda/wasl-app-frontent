@@ -45,16 +45,13 @@ export default function TodayTab() {
                 router.replace('/auth/login')
             } else {
                 console.log(res)
-                alert('error getting data click refresh button')
                 return null
             }
         })
             .then(json_data => {
                 if (json_data === null || !((typeof(json_data) == 'object') && ('data' in json_data))) {
-                    alert('no data for some reason')
 
                 } else if (json_data.data.length === 0) {
-                    alert('no order yet')
                     setData([])
                 } else {
                     setData(json_data.data)
@@ -106,18 +103,18 @@ export default function TodayTab() {
                     router.replace('/auth/login')
                 }
                 console.log(res)
-                alert('error confirming order click refresh button')
+                
                 return null
             }
         })
             .then(json_data => {
                 setLoading(false)
                 if (json_data === null) {
-                    alert('no data for some reason')
+                    
                 }
 
                 if (typeof(json_data) == 'object' && 'success' in json_data) {
-                    alert(json_data.success)
+                    
                 }
 
                 refreshData()
