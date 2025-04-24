@@ -92,11 +92,7 @@ export default function ActiveTab() {
         I18nManager.allowRTL(true) // force RTL layout
         console.log(I18nManager.isRTL)
 
-        if (shouldBeRTL !== I18nManager.isRTL && Platform.OS !== 'web') {
-            I18nManager.allowRTL(shouldBeRTL);
-            I18nManager.forceRTL(shouldBeRTL);
-            Updates.reloadAsync();
-          }
+        
 
         if (!isConnected) {
             echo.channel('order.created')
