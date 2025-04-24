@@ -38,10 +38,10 @@ export default function ActiveTab() {
         wssPort: 443,
         forceTLS: false,
         enabledTransports: ['ws', 'wss'],
-    });
+    }); 
 
 
-
+ 
     const toggleSwitch = () => {
         setData([]);
         setIsEnabled(previousState => !previousState);

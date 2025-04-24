@@ -41,10 +41,8 @@ export default function GuestManager({children}: {children: React.ReactNode}) {
 
                 // Artificially delay for two seconds to simulate a slow loading
                 // experience. Remove this if you copy and paste the code!
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
                 if (token) {
-                    router.replace('/(tabs)')
+                    setTimeout(() => router.replace('/(tabs)'), 1000)
                 }
                 
             } catch (e) {
@@ -52,10 +50,11 @@ export default function GuestManager({children}: {children: React.ReactNode}) {
             } finally {
                 // Tell the application to render
                 setAppIsReady(true);
+                SplashScreen.hide();
             }
         }
 
-        setTimeout(prepare, 1000)
+        prepare()
     }, []);
 
     const onLayoutRootView = useCallback(() => {
@@ -65,11 +64,13 @@ export default function GuestManager({children}: {children: React.ReactNode}) {
                 // loading its initial state and rendering its first pixels. So instead,
                 // we hide the splash screen once we know the root view has already
                 // performed layout.
+                console.log('hide the splash screeen')
                 SplashScreen.hide();
             }
         }, [appIsReady]);
     
         if (!appIsReady) {
+            console.log('hide the splash ')
             return null;
         }
 

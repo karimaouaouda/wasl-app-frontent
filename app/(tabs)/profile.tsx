@@ -2,11 +2,12 @@ import { ScrollView, View, Text, TouchableOpacity, Image } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Link } from "expo-router";
+import AuthManager from "@/components/layouts/AuthLayout";
 
 export default function ProfileTab() {
     // retrieve the query param : order_id
     return (
-        <ScrollView className="w-screen h-screen bg-slate-100 p-4 flex flex-col gap-2">
+        <AuthManager refreshAction={() => null}> 
             {/* the top view (back/page name) */}
             <View className="w-full flex flex-row justify-between items-center">
 
@@ -66,10 +67,6 @@ export default function ProfileTab() {
                     </View>
                 </ScrollView>
             </View>
-
-        
-
-
-        </ScrollView>
+        </AuthManager>
     )
 }
