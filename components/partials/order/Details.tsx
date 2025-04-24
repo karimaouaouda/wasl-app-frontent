@@ -1,19 +1,24 @@
-import { ScrollView, View, Text, I18nManager, Image, TouchableOpacity, RefreshControl } from "react-native";
-import { Link, useLocalSearchParams } from "expo-router";
+import { ScrollView, View, Text, I18nManager, Image, TouchableOpacity, RefreshControl, ActivityIndicator, Alert, Pressable, Button } from "react-native";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useState } from "react";
 import { Linking } from "react-native";
 import '@/global.css'
 import Order from "@/types";
+import Auth from "@/services/authservice";
 
 export default function Details({order}: {order: Order}) {
     const [tab, setTab] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
+    const [picking, setPicking] = useState<boolean>(false)
     const tabs = [
         { id: 0, name: I18nManager.isRTL ? "التفاصيل" : "Details" },
         { id: 1, name: I18nManager.isRTL ? "تفاصيل الطلب" : "Order Details" },
     ];
+
+    const auth = new Auth()
+    const router = useRouter()
 
     function makePhoneCall(phone: string|number) {
         Linking.openURL(`tel:${phone}`)
@@ -21,6 +26,54 @@ export default function Details({order}: {order: Order}) {
 
     function makeWhatsCall(phone: string|number) {
         Linking.openURL(`whatsapp://send?text=Hello&phone=${phone}`)
+    }
+
+    function pickup(){
+        var order_id = order.id
+        setPicking(true)
+
+        let payload = new FormData
+        payload.append('order_id', `${order_id}`)
+
+        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/pickup`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                contentType: 'application/json',
+                accept: 'application/json',
+                'Authorization': `Bearer ${auth.getToken()}`,
+            },
+            method: 'POST',
+            body: payload
+        }).then(function(response){
+            if( [200, 201, 400].includes(response.status) ){
+                return response.json();
+            }
+
+            if(response.status === 401){
+                auth.reset()
+                router.replace('/auth/login')
+                return null;
+            }
+
+            alert('some thing happen i don\'t know what')
+            return null
+        }).then(json_data => {
+            if( json_data && 'success' in json_data ){
+                alert(json_data['success'])
+            }
+
+            if( json_data && 'message' in json_data ){
+                Alert.alert('Bad Action', json_data.message, [{
+                    text: 'OK'
+                }], {
+                    userInterfaceStyle: 'dark'
+                })
+            }
+        }).catch(function(err){
+            console.error(err)
+        }).finally(()=> {
+            setPicking(false)
+        })
     }
 
     // retrive the query param : order_id
@@ -62,10 +115,15 @@ export default function Details({order}: {order: Order}) {
                     </View>
                 </View>
                 <View className="w-full mt-2">
-                    <TouchableOpacity className="bg-sky-500 text-white rounded-md py-2">
+                    <TouchableOpacity 
+                        onPress={pickup}
+                        disabled={picking}
+                        className="bg-sky-500 text-white rounded-md py-2">
+                        {!picking?
                         <Text className="text-white text-center font-semibold">
-                            {I18nManager.isRTL ? "إستلام" : "Pickup"}
-                        </Text>
+                        {I18nManager.isRTL ? "إستلام" : "Pickup"}
+                    </Text>:
+                    <ActivityIndicator size={'small'} color={'white'} />}
                     </TouchableOpacity>
                 </View>
             </View>

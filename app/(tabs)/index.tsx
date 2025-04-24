@@ -9,6 +9,7 @@ import Auth from "@/services/authservice";
 import Pusher from 'pusher-js/react-native';
 import Echo from 'laravel-echo';
 import * as Updates from 'expo-updates';
+import { getLocales } from 'expo-localization';
 
 export default function ActiveTab() {
     // initilize states
@@ -20,6 +21,9 @@ export default function ActiveTab() {
     const [isConnected, setIsConnected] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [rejectReason, setRejectReason] = useState<string>('');
+    const [orderIdToReject, setOrderIdToReject] = useState<number|string>(-1)
+
+    I18nManager.forceRTL(false);
 
 
 
@@ -87,10 +91,6 @@ export default function ActiveTab() {
         if (data.length === 0) {
             loadOrders()
         }
-
-        I18nManager.forceRTL(true)
-        I18nManager.allowRTL(true) // force RTL layout
-        console.log(I18nManager.isRTL)
 
          
 
@@ -173,22 +173,21 @@ export default function ActiveTab() {
             )
     }
 
-    function rejectOrder(order_id: number | string) {
+    function rejectOrder() {
         // push the order id to confirming queue
-        setRejectingQueue([...rejectingQueue, order_id])
-
-
-
-        let id: FormData = new FormData
-        id.append('order_id', `${order_id}`)
-        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/confirm`, {
+        setRejectingQueue([...rejectingQueue, orderIdToReject])
+        console.log('rejecting order : ' + orderIdToReject)
+        let payload: FormData = new FormData
+        payload.append('order_id', `${orderIdToReject}`)
+        payload.append('reason', rejectReason)
+        fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/reject`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Authorization': `Bearer ${auth.getToken()}`,
                 contentType: 'application/json'
             },
             method: 'POST',
-            body: id
+            body: payload
         }).then(res => {
             if (res.status === 200 || res.status === 201 || 400) {
                 return res.json()
@@ -198,27 +197,15 @@ export default function ActiveTab() {
             }
         })
             .then(json_data => {
-                setLoading(false)
-                if (json_data === null) {
-                }
-
-                if ('success' in json_data) {
-                }
-
-                //remove order_id from confirming queue
-                if (confirmingQueue !== null) {
-                    setRejectingQueue(rejectingQueue.filter((item) => item !== order_id))
-                }
-
+                console.log(json_data)
                 refreshData()
             }).catch(err => {
-                setLoading(false)
-                //remove order_id from confirming queue
-                if (confirmingQueue !== null) {
-                    setRejectingQueue(rejectingQueue.filter((item) => item !== order_id))
-                }
-            }
-            )
+                alert(err)
+            }).finally(()=> {
+                setRejectingQueue(rejectingQueue.filter((item) => item !== orderIdToReject ))
+                setOrderIdToReject(-1)
+                setModalVisible(false)
+            })
     }
 
     return (
@@ -291,7 +278,7 @@ export default function ActiveTab() {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     disabled={rejectingQueue?.includes(item.id)}
-                                    onPress={() => setModalVisible(true)}
+                                    onPress={() => {setOrderIdToReject(item.id); setModalVisible(true)}}
                                     className="bg-red-500 rounded-lg p-2 flex-1">
                                     {rejectingQueue?.includes(item.id) ?
                                         <ActivityIndicator color="white" size={20} /> :
@@ -335,15 +322,16 @@ export default function ActiveTab() {
                         />
                         <View className="flex flex-row gap-2 items-center">
                             <Pressable
+                                disabled={rejectingQueue.includes(orderIdToReject)}
                                 className="bg-blue-500 rounded-lg p-2 flex-1"
-                                onPress={() => setModalVisible(!modalVisible)}>
-                                <Text
-                                    className="text-white text-center font-semibold"
-                                >submit & reject</Text>
+                                onPress={() => rejectOrder()}>
+                                {rejectingQueue.includes(orderIdToReject) ?
+                                <ActivityIndicator size={'large'} color={"white"} /> :
+                                <Text className="font-semibold text-white text-center">submit & reject</Text>}
                             </Pressable>
                             <Pressable
                                 className="bg-red-500 rounded-lg p-2 flex-1"
-                                onPress={() => setModalVisible(!modalVisible)}>
+                                onPress={() => {orderIdToReject != -1 || setModalVisible(!modalVisible)}}>
                                 <Text
                                     className="text-white text-center font-semibold"
                                 >cancel</Text>

@@ -1,8 +1,9 @@
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { I18nManager, Image, Text, View } from "react-native";
+import { I18nManager, Image, Platform, Text, View } from "react-native";
 import '@/global.css';
 import GuestManager from "@/components/layouts/GuestLayout";
+import  * as Updates from 'expo-updates';
 
 export default function Index() {
 
@@ -11,8 +12,9 @@ export default function Index() {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [serverMessage, setServerMessage] = useState("");
 
-  useEffect(() => {
+  const shouldBeRtl = true;
 
+  useEffect(() => {
   }, []);
 
   return (
