@@ -65,7 +65,7 @@ export default function TodayTab() {
             })
     }
     useEffect(() => {
-        if (!data) {
+        if (data.length === 0) {
             console.log('gettting data ...')
             loadOrders()
         }

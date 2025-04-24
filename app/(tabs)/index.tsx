@@ -1,4 +1,4 @@
-import { Switch, Text, View, Image, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
+import { Switch, Text, View, Image, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator, Modal, Pressable, TextInput, Platform } from "react-native";
 import { useEffect, useState } from "react";
 import { I18nManager } from "react-native";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -8,7 +8,7 @@ import Order from "@/types";
 import Auth from "@/services/authservice";
 import Pusher from 'pusher-js/react-native';
 import Echo from 'laravel-echo';
-
+import * as Updates from 'expo-updates';
 
 export default function ActiveTab() {
     // initilize states
@@ -18,12 +18,17 @@ export default function ActiveTab() {
     const [confirmingQueue, setConfirmingQueue] = useState<Array<string | number>>([]);
     const [rejectingQueue, setRejectingQueue] = useState<Array<string | number>>([]);
     const [isConnected, setIsConnected] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [rejectReason, setRejectReason] = useState<string>('');
+
+
+
 
     const pusher = window.Pusher = Pusher;
 
     const echo = window.Echo = new Echo({
         broadcaster: 'reverb',
-        key: 'kzapg79rumofutkwh48h',
+        key: process.env.EXPO_PUBLIC_REVERB_APP_KEY,
         wsHost: process.env.EXPO_PUBLIC_WS_HOST,
         wsPort: process.env.EXPO_PUBLIC_WS_PORT,
         wssPort: 443,
@@ -39,6 +44,7 @@ export default function ActiveTab() {
     }
 
     const auth = new Auth()
+    const shouldBeRTL = true
 
     function loadOrders() {
         console.log('loading orders')
@@ -60,7 +66,7 @@ export default function ActiveTab() {
                 return { data: [] }
             } else {
                 console.log(res)
-                return null 
+                return null
             }
         })
             .then(json_data => {
@@ -81,6 +87,16 @@ export default function ActiveTab() {
         if (data.length === 0) {
             loadOrders()
         }
+
+        I18nManager.forceRTL(true)
+        I18nManager.allowRTL(true) // force RTL layout
+        console.log(I18nManager.isRTL)
+
+        if (shouldBeRTL !== I18nManager.isRTL && Platform.OS !== 'web') {
+            I18nManager.allowRTL(shouldBeRTL);
+            I18nManager.forceRTL(shouldBeRTL);
+            Updates.reloadAsync();
+          }
 
         if (!isConnected) {
             echo.channel('order.created')
@@ -279,7 +295,7 @@ export default function ActiveTab() {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     disabled={rejectingQueue?.includes(item.id)}
-                                    onPress={() => rejectOrder(item.id)}
+                                    onPress={() => setModalVisible(true)}
                                     className="bg-red-500 rounded-lg p-2 flex-1">
                                     {rejectingQueue?.includes(item.id) ?
                                         <ActivityIndicator color="white" size={20} /> :
@@ -292,6 +308,55 @@ export default function ActiveTab() {
 
                 {data.length == 0 && (loading ? <ActivityIndicator color="green" size={'large'} /> : <Text className="text-center py-4 font-semibold text-red-500">{I18nManager.isRTL ? "لا توجد طلبات" : "No Orders Yet"}</Text>)}
             </View>
+
+
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    alert('Modal has been closed.');
+                    setModalVisible(!modalVisible);
+                }}>
+                <View className="flex-1 justify-center items-center bg-gray-900/75">
+                    <View className="bg-white rounded-lg p-4 shadow-lg w-4/5">
+                        <Text className="text-lg font-bold text-center mb-4">
+                            {I18nManager.isRTL ? "يرجى إخبارنا عن سبب الرفض" : "Please tell us why you reject"}
+                        </Text>
+                        <Text className="w-full p-2 bg-red-500/50 text-white font-semibold mb-2 text-sm italic">
+                            {I18nManager.isRTL ? "لا يمكنك رفض أكثر من 10 توصيلات في الأسبوع وإن فعلت ذلك ستتعرض لعقوبة من التطبيق" : "You can't reject more than 10 deliveries in a week and if you do, you will be penalized by the app"}
+                        </Text>
+                        <TextInput
+                            className="border border-gray-300 rounded-lg p-2 mb-4"
+                            placeholder={I18nManager.isRTL ? "سبب الرفض" : "Reason for rejection"}
+                            value={rejectReason}
+                            onChangeText={setRejectReason}
+                            multiline={true}
+                            numberOfLines={4}
+                            textAlignVertical="top"
+                            style={{ maxHeight: 100 }} // Limit the height of the TextInput
+                        />
+                        <View className="flex flex-row gap-2 items-center">
+                            <Pressable
+                                className="bg-blue-500 rounded-lg p-2 flex-1"
+                                onPress={() => setModalVisible(!modalVisible)}>
+                                <Text
+                                    className="text-white text-center font-semibold"
+                                >submit & reject</Text>
+                            </Pressable>
+                            <Pressable
+                                className="bg-red-500 rounded-lg p-2 flex-1"
+                                onPress={() => setModalVisible(!modalVisible)}>
+                                <Text
+                                    className="text-white text-center font-semibold"
+                                >cancel</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+
+            </Modal>
         </AuthManager>
     )
 }

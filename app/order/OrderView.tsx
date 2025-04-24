@@ -51,6 +51,7 @@ export default function OrderView() {
         let order_id = local.order_id
         // set loading to true
         setLoading(true)
+        console.log('geting : ' + `${process.env.EXPO_PUBLIC_API_URL}/orders/${order_id}`)
 
         // fetch the order data from the api
         fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/${order_id}`, {
