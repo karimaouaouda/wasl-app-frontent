@@ -92,7 +92,7 @@ export default function ActiveTab() {
         I18nManager.allowRTL(true) // force RTL layout
         console.log(I18nManager.isRTL)
 
-        
+         
 
         if (!isConnected) {
             echo.channel('order.created')
