@@ -45,7 +45,7 @@ export default function Details({order}: {order: Order}) {
             method: 'POST',
             body: payload
         }).then(function(response){
-            if( [200, 201, 400].includes(response.status) ){
+            if( [200, 201, 400, 404].includes(response.status) ){
                 return response.json();
             }
 
@@ -55,7 +55,7 @@ export default function Details({order}: {order: Order}) {
                 return null;
             }
 
-            alert('some thing happen i don\'t know what')
+            alert('some thing happen i don\'t know what with status : ' + response.status)
             return null
         }).then(json_data => {
             if( json_data && 'success' in json_data ){
