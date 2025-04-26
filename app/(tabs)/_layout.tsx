@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { I18nManager, Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -31,7 +31,7 @@ export default function TabLayout() {
         options={{
           tabBarActiveTintColor: 'dodgerblue',
           tabBarInactiveTintColor: '#687076',
-          title: 'Active',
+          title: I18nManager.isRTL ? 'نشط' : 'Active',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name={"home"} color={color} />,
         }}
       />
@@ -40,7 +40,7 @@ export default function TabLayout() {
         options={{
           tabBarActiveTintColor: 'dodgerblue',
           tabBarInactiveTintColor: '#687076',
-          title: 'Today',
+          title: I18nManager.isRTL ? 'اليوم': 'Today',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="delivery-dining" color={color} />,
         }}
       />
@@ -49,7 +49,7 @@ export default function TabLayout() {
         options={{
           tabBarActiveTintColor: 'dodgerblue',
           tabBarInactiveTintColor: '#687076',
-          title: 'Finished',
+          title: I18nManager.isRTL ? 'منتهية' : 'Finished',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="checklist" color={color} />,
         }}
       />
@@ -58,7 +58,7 @@ export default function TabLayout() {
         options={{
           tabBarActiveTintColor: 'dodgerblue',
           tabBarInactiveTintColor: '#687076',
-          title: 'Profile',
+          title: I18nManager.isRTL ? 'حسابي' : 'Profile',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="account-circle" color={color} />,
         }}
       />
