@@ -4,14 +4,10 @@ import {
   View,
   Image,
   TouchableOpacity,
-  ScrollView,
-  RefreshControl,
   ActivityIndicator,
   Modal,
   Pressable,
-  TextInput,
-  Platform,
-} from 'react-native';
+  TextInput,} from 'react-native';
 import { useEffect, useState } from 'react';
 import { I18nManager } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -21,10 +17,9 @@ import Order from '@/types';
 import Auth from '@/services/authservice';
 import Pusher from 'pusher-js/react-native';
 import Echo from 'laravel-echo';
-import * as Updates from 'expo-updates';
-import { getLocales } from 'expo-localization';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+
 dayjs.extend(relativeTime);
 
 export default function ActiveTab() {
