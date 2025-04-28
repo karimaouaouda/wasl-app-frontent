@@ -1,4 +1,4 @@
-import { Link, router } from "expo-router";
+import { Link, router, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Button, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { I18nManager } from "react-native";
@@ -25,22 +25,54 @@ export default function RegisterScreen() {
     const [loading, setLoading] = useState<boolean>(false);
 
     const auth = new AuthManager()
+    const router = useRouter()
 
 
     useEffect(() => {
         // check whether there is a token in secure storage
-        if(auth.check()){
-            router.navigate('/(tabs)')
+        // if there is a token, navigate to home page
+        if( auth.getToken() ){
+            router.replace('/(tabs)')
         }
     }, [])
 
 
     function register() {
-        let errors = {}
         setErrors(null)
-        setLoading(true);
-        console.log(auth.register(name, email, password, passwordConfirmation))
-        setLoading(false);
+        setLoading(true)
+
+        var payload = new FormData
+        payload.append('name', name)
+        payload.append('email', email)
+        payload.append('password', password)
+        payload.append('password_confirmation', passwordConfirmation)
+        fetch(`${process.env.EXPO_PUBLIC_API_URL}/register`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                contentType: 'application/json',
+                accept: 'application/json'
+            },
+            method: 'POST',
+            body: payload
+        }).then(res => res.json())
+        .then(json_data => {
+            if( json_data && 'success' in json_data ){
+                let token = json_data['token']
+                auth.setToken(token)
+                router.replace('/(tabs)')
+                return
+            }
+
+            if( json_data && 'errors' in json_data ){
+                setErrors(json_data.errors)
+            }else{
+                alert(json_data.message)
+            }
+        }).catch(err => {
+            alert(err)
+        }).finally(() => {
+            setLoading(false)
+        })
     }
 
 

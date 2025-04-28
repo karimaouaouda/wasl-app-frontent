@@ -21,6 +21,23 @@ export default function ProfileTab() {
   const handleLogout = async () => {
     try {
       const auth = new Auth(); // إنشاء نسخة من الكلاس Auth
+
+      // you forget to ask the server to unvaliadte the token
+
+      fetch(`${process.env.EXPO_PUBLIC_API_URL}/logout`, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          Authorization: `Bearer ${auth.getToken()}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('Logout response:', data);
+        })
+        .catch((error) => {
+          console.error('Error during logout request:', error);
+        });
       await auth.reset();      // مسح التوكن واليوزر آيدي
       console.log('User data fully removed 🌟');
 
