@@ -246,7 +246,7 @@ export default function OrderView() {
           </View>
 
           {tab === 0 ? (
-            <Details order={orderData} />
+            <Details order={orderData} setOrder={setOrderData} />
           ) : (
             <OrderDetails order={orderData} />
           )}

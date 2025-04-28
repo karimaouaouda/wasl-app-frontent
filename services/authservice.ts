@@ -1,5 +1,6 @@
 import Validator from "./validationservice"
 import * as SecureStore from 'expo-secure-store'
+import {User} from '@/types'
 
 export default class Auth{
     #token: string|null
@@ -20,6 +21,10 @@ export default class Auth{
 
     getToken(){
         return  SecureStore.getItem('token')
+    }
+
+    setUser(user: User){
+        SecureStore.setItem('user', JSON.stringify(user))
     }
 
     getUserId(){

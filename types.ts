@@ -1,9 +1,22 @@
-interface User{
+export interface User{
     id: number;
     name: string;
+    username?: string;
     email: string;
     token: string|null;
 }
+
+interface OrderPivot{
+    order_id: number|string;
+    user_id: number|string;
+    status: string
+}
+
+interface OrderUser extends User{
+    pivot?: OrderPivot
+}
+
+var user: OrderUser;
 
 interface OrderItem{
     id: number;
@@ -41,6 +54,7 @@ interface Order{
     created_at: string;
     updated_at: string;
     items: OrderItem[];
+    users?: OrderUser[]
 }
 
 export interface OrderData{

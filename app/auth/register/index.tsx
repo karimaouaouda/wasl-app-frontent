@@ -59,6 +59,7 @@ export default function RegisterScreen() {
             if( json_data && 'success' in json_data ){
                 let token = json_data['token']
                 auth.setToken(token)
+                auth.setUser(json_data['user'])
                 router.replace('/(tabs)')
                 return
             }

@@ -32,16 +32,18 @@ export default function ProfileTab() {
         },
       })
         .then((response) => response.json())
-        .then((data) => {
+        .then(async (data) => {
           console.log('Logout response:', data);
+          if( data && 'success' in data ){
+            await auth.reset();      // مسح التوكن واليوزر آيدي
+            console.log('User data fully removed 🌟');
+            router.push('/auth/login'); // روح بعدها على صفحة تسجيل الدخول
+          }
+
         })
         .catch((error) => {
           console.error('Error during logout request:', error);
         });
-      await auth.reset();      // مسح التوكن واليوزر آيدي
-      console.log('User data fully removed 🌟');
-
-      router.push('/auth/login'); // روح بعدها على صفحة تسجيل الدخول
     } catch (error) {
       console.error('Error during logout:', error);
     }
@@ -60,7 +62,7 @@ export default function ProfileTab() {
             color='#767577'
           />
         </Link>
-        <Text className='text-lg font-bold text-center'>{user?.username??user?.name}</Text>
+        <Text className='text-lg font-bold text-center'>{user?.username ?? user?.name}</Text>
         <Text className='text-sm text-green-500'>v1.0.0</Text>
       </View>
       {/* profile banner */}

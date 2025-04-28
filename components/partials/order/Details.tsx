@@ -1,30 +1,24 @@
 import {
-  ScrollView,
   View,
   Text,
   I18nManager,
   Image,
   TouchableOpacity,
-  RefreshControl,
   ActivityIndicator,
   Alert,
-  Pressable,
-  Button,
 } from 'react-native';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useState } from 'react';
 import { Linking } from 'react-native';
-import '@/global.css';
 import Order from '@/types';
 import Auth from '@/services/authservice';
-import OrderDetails from './OrderDetails';
 
-export default function Details({ order }: { order: Order }) {
-  const [tab, setTab] = useState(0);
-  const [refreshing, setRefreshing] = useState(false);
+export default function Details({ order, setOrder }: { order: Order, setOrder: any }) {
   const [picking, setPicking] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false)
   const tabs = [
     { id: 0, name: I18nManager.isRTL ? 'التفاصيل' : 'Details' },
     { id: 1, name: I18nManager.isRTL ? 'تفاصيل الطلب' : 'Order Details' },
@@ -43,7 +37,7 @@ export default function Details({ order }: { order: Order }) {
 
   function pickup() {
     var order_id = order.id;
-    setPicking(true);
+    setLoading(true);
 
     let payload = new FormData();
     payload.append('order_id', `${order_id}`);
@@ -77,6 +71,7 @@ export default function Details({ order }: { order: Order }) {
       .then((json_data) => {
         if (json_data && 'success' in json_data) {
           alert(json_data['success']);
+          setOrder(json_data['order'])
         }
 
         if (json_data && 'message' in json_data) {
@@ -98,9 +93,91 @@ export default function Details({ order }: { order: Order }) {
         console.error(err);
       })
       .finally(() => {
-        setPicking(false);
+        setLoading(false);
       });
   }
+  function acceptOrder() {
+    // push the order id to confirming queue
+    setLoading(true)
+    let id: FormData = new FormData();
+    id.append('order_id', `${order.id}`);
+    fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/confirm`, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Authorization: `Bearer ${auth.getToken()}`,
+        contentType: 'application/json',
+      },
+      method: 'POST',
+      body: id,
+    })
+      .then((res) => {
+        if (res.status === 200 || res.status === 201 || 400) {
+          return res.json();
+        } else {
+          console.log(res);
+          return null;
+        }
+      })
+      .then((json_data) => {
+        setLoading(false);
+        if (json_data === null) {
+        }
+
+        if ('success' in json_data) {
+          setOrder(json_data['order'])
+        }
+      })
+      .catch((err) => {
+        //remove order_id from confirming queue
+        console.log(err)
+      }).finally(() => setLoading(false))
+  }
+
+  function finishOrder() {
+      // add the order to the queue
+      setLoading(true)
+      let id: FormData = new FormData();
+      id.append('order_id', `${order.id}`);
+  
+      fetch(`${process.env.EXPO_PUBLIC_API_URL}/orders/complete`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          Authorization: `Bearer ${auth.getToken()}`,
+          contentType: 'application/json',
+        },
+        method: 'POST',
+        body: id,
+      })
+        .then((res) => {
+          if (res.status === 200 || res.status === 201 || 400) {
+            return res.json();
+          } else {
+            if (res.status === 401) {
+              auth.reset();
+              router.replace('/auth/login');
+            }
+            console.log(res);
+  
+            return null;
+          }
+        })
+        .then((json_data) => {
+          setLoading(false);
+          if (json_data === null) {
+          }
+  
+          if (typeof json_data == 'object' && 'success' in json_data) {
+            setOrder(json_data['order'])
+          }
+          })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          // remove the order from the queue
+          setLoading(false)
+        });
+    }
 
   // retrive the query param : order_id
   const local = useLocalSearchParams();
@@ -147,18 +224,50 @@ export default function Details({ order }: { order: Order }) {
           </View>
         </View>
         <View className='w-full mt-2'>
-          <TouchableOpacity
-            onPress={pickup}
-            disabled={picking}
+          {(order.users?.length === 0) && (<TouchableOpacity
+            onPress={acceptOrder}
+            disabled={loading}
             className='py-2 text-white rounded-md bg-sky-500'>
-            {!picking ? (
+            {!loading ? (
               <Text className='font-semibold text-center text-white'>
-                {I18nManager.isRTL ? 'إستلام' : 'Pickup'}
+                {I18nManager.isRTL ? 'قبول' : 'Accept'}
               </Text>
             ) : (
               <ActivityIndicator size={'small'} color={'white'} />
             )}
-          </TouchableOpacity>
+          </TouchableOpacity>)}
+
+          {( order.users && order.users?.length > 0) && (order.users[0].pivot?.status == 'accepted') && (<TouchableOpacity
+            onPress={pickup}
+            disabled={loading}
+            className='py-2 text-white rounded-md bg-sky-500'>
+            {!loading ? (
+              <Text className='font-semibold text-center text-white'>
+                {I18nManager.isRTL ? 'إستلام' : 'Pick up'}
+              </Text>
+            ) : (
+              <ActivityIndicator size={'small'} color={'white'} />
+            )}
+          </TouchableOpacity>)}
+
+          {( order.users && order.users?.length > 0) && (order.users[0].pivot?.status == 'picked') && (<TouchableOpacity
+            onPress={finishOrder}
+            disabled={loading}
+            className='py-2 text-white rounded-md bg-sky-500'>
+            {!loading ? (
+              <Text className='font-semibold text-center text-white'>
+                {I18nManager.isRTL ? 'إنهاء' : 'complete'}
+              </Text>
+            ) : (
+              <ActivityIndicator size={'small'} color={'white'} />
+            )}
+          </TouchableOpacity>)}
+
+          {( order.users && order.users?.length > 0) && (order.users[0].pivot?.status == 'completed') && (
+            <Text className='font-semibold text-green-600 text-center'>
+            {I18nManager.isRTL ? 'تم الانتهاء': 'completed'}
+          </Text>)}
+
         </View>
       </View>
 
