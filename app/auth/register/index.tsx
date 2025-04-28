@@ -51,70 +51,70 @@ export default function RegisterScreen() {
             <ScreenTitle
                 classes="text-white"
                 title="back" />
-            <View className="flex justify-start flex-row space-x-2 items-center w-full px-10 mt-20">
+            <View className="flex flex-row items-center justify-start w-full px-10 mt-20 space-x-2">
                 <Image
                     source={require('@/assets/icons/delivery-white.png')}
                     alt="Logo"
                     className="!w-24 !h-24"
                     resizeMode="contain"
                 />
-                <View className="flex flex-1 flex-col items-start justify-center space-y-2">
-                    <Text className="text-start w-fit text-2xl font-bold p-0 text-white">
+                <View className="flex flex-col items-start justify-center flex-1 space-y-2">
+                    <Text className="p-0 text-2xl font-bold text-white text-start w-fit">
                         {I18nManager.isRTL ? 'وصل - إفتح حسابا ' : 'Register'}
                     </Text>
-                    <Text className="text-start text-white text-md word-wrap overflow-wrap">
+                    <Text className="text-white text-start text-md word-wrap overflow-wrap">
                         {I18nManager.isRTL ? 'وصل المطاعم بمندوبي التوصيل المتعاقدين معنا' : 'Connection restaurents with delivery partners'}
                     </Text>
                 </View>
             </View>
 
-            <View className="w-full flex flex-col items-center justify-center mt-10 px-14 gap-4">
+            <View className="flex flex-col items-center justify-center w-full gap-4 mt-10 px-14">
                 <TextInput
                     placeholder="Name"
                     onChangeText={setName}
-                    className="w-full bg-white rounded-lg p-4 text-sm text-gray-700" />
-                {errors?.name && <Text className="text-white text-sm">{errors.name}</Text>}
+                    className="w-full p-4 text-sm text-gray-700 bg-white rounded-lg" />
+                {errors?.name && <Text className="text-sm text-white">{errors.name}</Text>}
                 <TextInput
                     placeholder="Email"
                     onChangeText={setEmail}
-                    className="w-full bg-white rounded-lg p-4 text-sm text-gray-700" />
-                {errors?.email && <Text className="text-white text-sm">{errors.email}</Text>}
+                    className="w-full p-4 text-sm text-gray-700 bg-white rounded-lg" />
+                {errors?.email && <Text className="text-sm text-white">{errors.email}</Text>}
                 <TextInput
                     placeholder="Password"
                     onChangeText={setPassword}
-                    className="w-full bg-white rounded-lg p-4 text-sm text-gray-700" />
-                {errors?.password && <Text className="text-white text-sm">{errors.password}</Text>}
+                    className="w-full p-4 text-sm text-gray-700 bg-white rounded-lg" />
+                {errors?.password && <Text className="text-sm text-white">{errors.password}</Text>}
                 <TextInput
                     onChangeText={setPasswordConfirmation}
                     placeholder="Password Confirmation"
-                    className="w-full bg-white rounded-lg p-4 text-sm text-gray-700" />
-                {errors?.password_confirmation && <Text className="text-white text-sm">{errors.password_confirmation}</Text>}
+                    className="w-full p-4 text-sm text-gray-700 bg-white rounded-lg" />
+                {errors?.password_confirmation && <Text className="text-sm text-white">{errors.password_confirmation}</Text>}
                 <TouchableOpacity
                     disabled={loading}
-                    className="w-1/2 bg-slate-100 rounded-lg py-3 flex flex-row space-x-2 items-end justify-center" onPress={register}>
+                    className="flex flex-row items-end justify-center w-1/2 py-3 space-x-2 rounded-lg bg-slate-100" onPress={register}>
                     {loading ? <ActivityIndicator size="small" color="red" /> : <Text> Register</Text>}
                 </TouchableOpacity>
-                <Text className="text-white text-sm">Or</Text>
+                <Text className="text-sm text-white">Or</Text>
                 <TouchableOpacity
-                    className="w-full bg-white rounded-lg py-3 flex flex-row space-x-2 items-center justify-center" onPress={() => { }}>
+                    className="flex flex-row items-center justify-center w-full py-3 space-x-2 bg-white rounded-lg" onPress={() => { }}>
                     <Image
                         source={require('@/assets/icons/google.png')}
                         alt="Google" className="!w-8 !h-8"
                         resizeMode="contain" />
-                    <Text className="text-black text-center text-lg">Register with Google</Text>
+                    <Text className="text-lg text-center text-black">Register with Google</Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="w-full bg-white rounded-lg py-3 flex flex-row space-x-2 items-center justify-center" onPress={() => { }}>
+                <TouchableOpacity className="flex flex-row items-center justify-center w-full py-3 space-x-2 bg-white rounded-lg" onPress={() => { }}>
                     <Image
                         source={require('@/assets/icons/facebook-f.png')}
                         alt="Google" className="!w-6 !h-6"
                         resizeMode="contain" />
-                    <Text className="text-black text-center text-lg">Register with Facebook</Text>
+                    <Text className="text-lg text-center text-black">Register with Facebook</Text>
                 </TouchableOpacity>
-                <Text className="text-white text-sm">Don't have an account? <Link href="/auth/register" className="text-white font-bold">Register</Link></Text>
-                <Text className="text-white text-sm text-center">By signing in you agree to our <Link href={"/home"} className="text-white font-bold">Terms of Service</Link> and <Link href="/home" className="text-white font-bold">Privacy Policy</Link></Text>
+                <Text className="text-sm text-white">Don't have an account? <Link href="/auth/register" className="font-bold text-white">Register</Link></Text>
+                <Text className="text-sm text-center text-white">By signing in you agree to our <Link href={"/home"} className="font-bold text-white">Terms of Service</Link> and <Link href="/home" className="font-bold text-white">Privacy Policy</Link></Text>
 
             </View>
-            <Text className="w-full text-white text-sm text-center absolute bottom-4 left-0">© 2025 Wasl. All rights reserved.</Text>
+            <Text className="absolute left-0 w-full text-sm text-center text-white bottom-4">© 2025 Wasl. All rights reserved.</Text>
         </View>
     );
 }
