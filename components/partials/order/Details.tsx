@@ -19,6 +19,7 @@ import { Linking } from 'react-native';
 import '@/global.css';
 import Order from '@/types';
 import Auth from '@/services/authservice';
+import OrderDetails from './OrderDetails';
 
 export default function Details({ order }: { order: Order }) {
   const [tab, setTab] = useState(0);
@@ -125,12 +126,12 @@ export default function Details({ order }: { order: Order }) {
               <Text className='ml-2 text-sm font-semibold text-gray-500'>
                 {I18nManager.isRTL
                   ? 'الإستلام: فرع القيروان'
-                  : 'Pickup: Al-Qayrawan Branch'}
+                  : `Pickup: ${order.restaurant_data[0].name}`}
               </Text>
               <Text className='ml-2 text-sm font-semibold text-gray-500'>
                 {I18nManager.isRTL
-                  ? 'وقت التوصيل: 05/04/2025 - 14:05'
-                  : 'Delivery Time: 05/04/2025 - 14:05'}
+                  ? `وقت التوصيل: ${new Date(order.updated_at).toLocaleTimeString(['ar-sa'], { hour: '2-digit', minute: '2-digit' })}`
+                  : `Delivery Time: ${new Date(order.updated_at).toLocaleTimeString(['en-us'], { hour: '2-digit', minute: '2-digit' })}`}
               </Text>
             </View>
           </View>
@@ -177,13 +178,13 @@ export default function Details({ order }: { order: Order }) {
               </Text>
               <Text className='ml-2 text-sm font-semibold text-gray-500'>
                 {I18nManager.isRTL
-                  ? 'العننوان: الوصف المعنا '
-                  : 'Address: Description'}
+                  ? 'العنوان: الوصف المعنا '
+                  : `Address: ${order.restaurant_data[0].description}`}
               </Text>
               <Text className='ml-2 text-sm font-semibold text-gray-500'>
                 {I18nManager.isRTL
-                  ? 'وقت التوصيل: 05/04/2025 - 14:05'
-                  : 'Delivery Time: 05/04/2025 - 14:05'}
+                   ? `وقت التوصيل: ${new Date(order.updated_at).toLocaleTimeString(['ar-sa'], { hour: '2-digit', minute: '2-digit' })}`
+                   : `Delivery Time: ${new Date(order.updated_at).toLocaleTimeString(['en-us'], { hour: '2-digit', minute: '2-digit' })}`}
               </Text>
             </View>
           </View>
@@ -194,7 +195,7 @@ export default function Details({ order }: { order: Order }) {
               <IconSymbol name='phone' size={24} color='#fff' />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => makeWhatsCall(order.restaurant_data[0].whatsapp)}
+              onPress={() => makeWhatsCall(order.restaurant_data[0].phone)}
               className='p-2 rounded-lg bg-sky-500'>
               <FontAwesome name='whatsapp' size={24} color='white' />
             </TouchableOpacity>

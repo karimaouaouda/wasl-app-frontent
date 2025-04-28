@@ -6,12 +6,30 @@ import {
   Image,
   Pressable,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Link } from 'expo-router';
 import AuthManager from '@/components/layouts/AuthLayout';
+import { useAuth } from '@/hooks/auth';
+import Auth from '@/services/authservice'; 
 
+ 
 export default function ProfileTab() {
+
+  const { user } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      const auth = new Auth(); // إنشاء نسخة من الكلاس Auth
+      await auth.reset();      // مسح التوكن واليوزر آيدي
+      console.log('User data fully removed 🌟');
+
+      router.push('/auth/login'); // روح بعدها على صفحة تسجيل الدخول
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+  
   // retrieve the query param : order_id
   return (
     <AuthManager refreshAction={() => null}>
@@ -25,7 +43,7 @@ export default function ProfileTab() {
             color='#767577'
           />
         </Link>
-        <Text className='text-lg font-bold text-center'>Alaa Hamed</Text>
+        <Text className='text-lg font-bold text-center'>{user?.username??user?.name}</Text>
         <Text className='text-sm text-green-500'>v1.0.0</Text>
       </View>
       {/* profile banner */}
@@ -41,10 +59,10 @@ export default function ProfileTab() {
             <Text
               className='text-lg font-bold text-center'
               style={{ fontSize: 20 }}>
-              Alaa Hamed
+              {user?.name ?? 'Guest'}
             </Text>
             <Text className='text-xs font-bold text-center text-gray-400'>
-              20412253KSA@aou.edu.sa
+              {user?.email}
             </Text>
           </View>
         </View>
@@ -112,7 +130,22 @@ export default function ProfileTab() {
             </Text>
           </View>
         </TouchableOpacity>
+        {/* زر تسجيل الخروج */}
+        <TouchableOpacity
+          touchSoundDisabled={false}
+          onPress={handleLogout}
+          className='flex flex-row items-center justify-between w-full p-2 rounded-md'>
+          <View className='flex flex-row gap-2 w-fit'>
+            <IconSymbol name='logout' size={26} color='#767577' />
+            <Text className='text-lg font-semibold text-slate-800'>
+            Log Out
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
+
+       
+      
     </AuthManager>
   );
 }
