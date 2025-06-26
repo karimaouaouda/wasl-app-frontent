@@ -98,6 +98,7 @@ export default function ActiveTab() {
         setLoading(false);
       });
   }
+  
   useEffect(() => {
     if (data.length === 0) {
       loadOrders();
@@ -357,7 +358,7 @@ export default function ActiveTab() {
             <ActivityIndicator color='green' size={'large'} />
           ) : (
             <Text className='py-4 font-semibold text-center text-red-500'>
-              {I18nManager.isRTL ? 'لا توجد طلبات' : 'No Orders Yet'}
+              {I18nManager.isRTL ? 'لا توجد طلبات الان' : 'No Orders Yet'}
             </Text>
           ))}
       </View>

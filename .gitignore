@@ -16,6 +16,7 @@ android/
 *.p12
 *.key
 *.mobileprovision
+.vscode
 
 # Metro
 .metro-health-check*
@@ -38,3 +39,5 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+wasl-a7deb-firebase-adminsdk-fbsvc-2bc0b4abb3.json
+google-services.json
